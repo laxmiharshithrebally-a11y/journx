@@ -2,7 +2,9 @@
 > **Event:** NVIDIA × Nebius AI Global Hackathon 2026  
 > **Track:** Best Multimodal Agents & Physical AI Operations  
 > **Project Title:** JOURNX — Autonomous Multimodal Travel Intelligence Platform  
-> **Short Tagline:** Transforming passive travel planning into autonomous physical operations with NVIDIA Nemotron-70B, real spatial geometry, and self-healing cuOpt detours.
+> **Short Tagline:** Transforming passive travel planning into autonomous physical operations with NVIDIA Nemotron-70B, real spatial geometry, and self-healing cuOpt detours.  
+> **GitHub Repository:** https://github.com/laxmiharshithrebally-a11y/journx  
+> **Test Suite:** 8/8 Tests Passing (`python test_submission.py`)
 
 ---
 
