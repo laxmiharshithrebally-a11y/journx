@@ -1,10 +1,15 @@
 # 🌐 JOURNX — Autonomous Multimodal Travel Intelligence Platform
 
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/laxmiharshithrebally-a11y/journx)
+[![Verification Status](https://img.shields.io/badge/Verification_Suite-8%2F8_PASSED-emerald)](test_submission.py)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](Dockerfile)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/laxmiharshithrebally-a11y/journx)
+
 > **NVIDIA × Nebius AI Global Hackathon 2026**  
 > **Track:** Best Multimodal Agents & Physical AI Operations  
 > **Target LLM:** NVIDIA Llama-3.1-Nemotron-70B-Instruct on Nebius AI Cloud  
 > **Logistics Solver:** NVIDIA cuOpt Graph Optimizer & Detour Routing  
-> **Live Interface:** `http://localhost:8080`
+> **Live GitHub:** https://github.com/laxmiharshithrebally-a11y/journx
 
 ---
 
