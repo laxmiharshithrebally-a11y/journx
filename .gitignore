@@ -48,3 +48,6 @@ ehthumbs.db
 # Temporary scratch
 scratch/
 tmp/
+
+cloudflared.exe
+

@@ -9,7 +9,8 @@
 > **Track:** Best Multimodal Agents & Physical AI Operations  
 > **Target LLM:** NVIDIA Llama-3.1-Nemotron-70B-Instruct on Nebius AI Cloud  
 > **Logistics Solver:** NVIDIA cuOpt Graph Optimizer & Detour Routing  
-> **Live GitHub:** https://github.com/laxmiharshithrebally-a11y/journx
+> **Live Web Platform:** https://bloomberg-island-longer-consumption.trycloudflare.com  
+> **GitHub Repository:** https://github.com/laxmiharshithrebally-a11y/journx
 
 ---
 
