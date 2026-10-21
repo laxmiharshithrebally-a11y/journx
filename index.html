@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOURNX — Autonomous Multimodal Travel Intelligence</title>
+
+  <!-- Modern Clean Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js (3D Globe Intro) & Leaflet (Interactive Maps) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="./src/styles.css?v=12.0">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       VIEW 1: 3D GLOBE CINEMATIC INTRO (TITLE & MULTIMODAL SYMBOLS)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="view-intro" class="journx-view active-view">
+    <!-- Intro Top Quick Controls -->
+    <div class="intro-top-controls" style="position: absolute; top: 1.5rem; right: 2rem; z-index: 100; display: flex; gap: 0.65rem; align-items: center;">
+      <button id="btn-intro-theme-toggle" class="btn-secondary-action btn-sm-compact" style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border-color: var(--amber-primary); color: #fff;">
+        🎨 Theme: Obsidian Gold ▾
+      </button>
+      <button id="btn-intro-audio-toggle" class="btn-secondary-action btn-sm-compact" style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px);">
+        🔇 Audio Off
+      </button>
+    </div>
+
+    <div id="globe-canvas-container"></div>
+
+    <div class="intro-cinematic-stage">
+      <!-- 3D Holographic Telemetry HUD Header -->
+      <div class="intro-hud-telemetry" style="display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--amber-primary); letter-spacing: 0.16em; margin-bottom: 1rem; background: rgba(0,0,0,0.6); padding: 0.38rem 0.95rem; border-radius: 999px; border: 1px solid var(--border-subtle); backdrop-filter: blur(12px);">
+        <span style="display:inline-block; width:6px; height:6px; background:var(--emerald-success); border-radius:50%; box-shadow:0 0 8px var(--emerald-success);"></span>
+        AUTONOMOUS MOBILITY GRID // VOYAGE INTELLIGENCE 2026 // NODE 17.385° N, 78.486° E
+      </div>
+
+      <!-- 3D Letter-by-Letter Decrypting Title -->
+      <div class="intro-3d-title-cluster" id="intro-title-cluster">
+        <span class="intro-letter">J</span>
+        <span class="intro-letter">O</span>
+        <span class="intro-letter">U</span>
+        <span class="intro-letter">R</span>
+        <span class="intro-letter">N</span>
+        <span class="intro-letter intro-letter-x">X</span>
+      </div>
+
+      <!-- Live Telemetry Status Console -->
+      <div id="intro-telemetry-log" style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--cyan-accent); letter-spacing: 0.12em; margin-bottom: 1.5rem; text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);">
+        SYNCHRONIZING ORBITAL GNSS // LAT 17.385° N, LNG 78.486° E
+      </div>
+
+      <!-- Multimodal Vehicle Symbols with Active Scanner -->
+      <div class="intro-symbols-strip" id="intro-symbols-strip">
+        <div class="intro-symbol-item" id="intro-sym-car" style="--sym-delay: 0.6s">
+          <div class="intro-symbol-badge">
+            <span class="intro-symbol-emoji">🚗</span>
+          </div>
+          <span class="intro-symbol-caption">ROAD</span>
+        </div>
+
+        <div class="intro-symbol-line"></div>
+
+        <div class="intro-symbol-item" id="intro-sym-train" style="--sym-delay: 0.9s">
+          <div class="intro-symbol-badge">
+            <span class="intro-symbol-emoji">🚆</span>
+          </div>
+          <span class="intro-symbol-caption">RAIL</span>
+        </div>
+
+        <div class="intro-symbol-line"></div>
+
+        <div class="intro-symbol-item" id="intro-sym-flight" style="--sym-delay: 1.2s">
+          <div class="intro-symbol-badge">
+            <span class="intro-symbol-emoji">✈️</span>
+          </div>
+          <span class="intro-symbol-caption">FLIGHT</span>
+        </div>
+
+        <div class="intro-symbol-line"></div>
+
+        <div class="intro-symbol-item" id="intro-sym-hybrid" style="--sym-delay: 1.5s">
+          <div class="intro-symbol-badge">
+            <span class="intro-symbol-emoji">⚡</span>
+          </div>
+          <span class="intro-symbol-caption">HYBRID</span>
+        </div>
+      </div>
+
+      <!-- Minimalist Tagline -->
+      <div class="intro-minimal-tagline" id="intro-tagline" style="margin-top: 0.5rem;">
+        Autonomous Multimodal Travel Intelligence Platform
+      </div>
+
+      <!-- Interactive 3D Orbital City Flight Targets -->
+      <div class="intro-city-dock" style="margin-top: 1.25rem; display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; max-width: 680px;">
+        <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); margin-right: 0.35rem; display: flex; align-items: center;">FOCUS ORBIT:</span>
+        <button class="intro-city-btn active" data-city="Hyderabad">🎯 Hyderabad</button>
+        <button class="intro-city-btn" data-city="Goa">🌴 Goa</button>
+        <button class="intro-city-btn" data-city="Mumbai">🏙️ Mumbai</button>
+        <button class="intro-city-btn" data-city="Dubai">✈️ Dubai</button>
+        <button class="intro-city-btn" data-city="Tokyo">🗼 Tokyo</button>
+        <button class="intro-city-btn" data-city="London">🇬🇧 London</button>
+      </div>
+
+      <!-- Action Button with Radar Pulse -->
+      <button id="btn-intro-skip" class="intro-skip-pill" title="Enter JOURNX Command Center" style="margin-top: 1.4rem; padding: 0.85rem 2.4rem; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+        <span>Enter Experience</span> ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       VIEW 2: DEDICATED LUXURY AUTHENTICATION PORTAL
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="view-auth" class="journx-view">
+    <div class="auth-split-layout">
+      
+      <!-- Left Brand Panel -->
+      <div class="auth-side-brand-panel">
+        <div>
+          <div class="brand-identity-cluster" style="margin-bottom: 2rem;">
+            <div class="brand-symbol-box">🌐</div>
+            <div class="brand-wordmark">JOURN<span>X</span></div>
+          </div>
+          <h2 style="font-family: var(--font-display); font-size: 2.1rem; color: #fff; line-height: 1.25; margin-bottom: 1rem; font-weight: 700;">
+            Autonomous Travel Operations & Decision Intelligence.
+          </h2>
+          <p style="color: var(--text-sub); font-size: 0.96rem; line-height: 1.65; margin-bottom: 2rem;">
+            Experience commercial-grade travel technology engineered for global journeys. Real multimodal transport comparisons, deterministic budgets, live atmospheric telemetry, and dynamic disruption replanning.
+          </p>
+
+          <div style="display: grid; gap: 0.95rem; font-size: 0.88rem; color: var(--text-muted);">
+            <div>✦ Multimodal Strategies: Road, Rail, Flight & Hybrid Corridors</div>
+            <div>✦ Deterministic Cost Breakdown with live and calculated provenance</div>
+            <div>✦ Live Atmospheric Radar with road surface traction friction index</div>
+            <div>✦ Autonomous Trip Guardian with live detour bypass rerouting</div>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-dim); letter-spacing: 0.08em;">
+          ENTERPRISE MOBILITY PLATFORM &bull; GLOBAL OPERATIONS
+        </div>
+      </div>
+
+      <!-- Right Form Card -->
+      <div class="auth-card-body">
+        <h2 class="auth-heading-large">Sign In to JOURNX</h2>
+        <p class="auth-sub-note">Access your autonomous travel workspace</p>
+
+        <form id="auth-user-form">
+          <div id="auth-group-name" class="form-group-block" style="display: none;">
+            <label class="form-label-tag">FULL NAME</label>
+            <input type="text" id="auth-input-name" class="form-input-control" placeholder="Harshith Traveler">
+          </div>
+
+          <div class="form-group-block">
+            <label class="form-label-tag">EMAIL ADDRESS</label>
+            <input type="email" id="auth-input-email" class="form-input-control" placeholder="traveler@journx.ai" value="traveler@journx.ai" required>
+          </div>
+
+          <div class="form-group-block">
+            <label class="form-label-tag">PASSWORD</label>
+            <input type="password" id="auth-input-pass" class="form-input-control" placeholder="••••••••••••" value="JournX2026!" required>
+          </div>
+
+          <button type="submit" id="btn-auth-submit" class="btn-primary-action" style="width: 100%; justify-content: center; padding: 0.9rem; margin-top: 0.5rem;">
+            Sign In
+          </button>
+        </form>
+
+        <div class="auth-divider-line">or</div>
+
+        <button id="btn-auth-demo" class="btn-secondary-action" style="width: 100%; justify-content: center; margin-bottom: 1.5rem;">
+          ⚡ Instant Access as Demo Traveler
+        </button>
+
+        <div style="text-align: center; font-size: 0.88rem; color: var(--text-muted);">
+          <button id="auth-toggle-mode-btn" style="background: none; border: none; color: var(--amber-primary); font-weight: 600; cursor: pointer;">
+            Don't have an account? Create Account
+          </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button id="btn-auth-back-intro" style="background: none; border: none; color: var(--text-dim); font-size: 0.82rem; cursor: pointer;">
+            ← Back to 3D Intro
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       VIEW 3: JOURNX COMMAND CENTER (THE MAIN WORKSPACE)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="view-app" class="journx-view">
+    
+    <!-- Top Command Navigation -->
+    <nav class="command-header-navbar">
+      <div class="brand-identity-cluster">
+        <div class="brand-symbol-box">🌐</div>
+        <div class="brand-wordmark">JOURN<span>X</span></div>
+      </div>
+
+      <div class="command-nav-tabs">
+        <button class="command-tab-btn active" data-tab="tab-planner">
+          <span>🗺️</span> Plan Journey
+        </button>
+        <button class="command-tab-btn" data-tab="tab-map-weather">
+          <span>📍</span> Map & Radar
+        </button>
+        <button class="command-tab-btn" data-tab="tab-trip-twin">
+          <span>🧬</span> Trip Twin
+        </button>
+        <button class="command-tab-btn" data-tab="tab-guardian">
+          <span>🛡️</span> Trip Guardian
+        </button>
+        <button class="command-tab-btn" data-tab="tab-itinerary-expenses">
+          <span>📅</span> Itinerary & Expenses
+        </button>
+        <button class="command-tab-btn" data-tab="tab-explore">
+          <span>🌍</span> Explore
+        </button>
+        <button class="command-tab-btn" data-tab="tab-profile">
+          <span>👤</span> Profile
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+        <div class="badge-tag-pill" style="margin-bottom: 0; padding: 0.3rem 0.65rem; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--emerald-success); font-family: var(--font-mono); font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span style="display:inline-block; width:6px; height:6px; background:var(--emerald-success); border-radius:50%; box-shadow:0 0 6px var(--emerald-success);"></span>
+          LATENCY: 12ms // LIVE
+        </div>
+        <button id="btn-theme-switcher" class="btn-secondary-action btn-sm-compact" title="Switch Theme Palette" style="border-color: var(--amber-primary); color: #fff;">
+          🎨 Theme: Obsidian Gold ▾
+        </button>
+        <button id="btn-judge-tour" class="btn-secondary-action btn-sm-compact" style="border-color: #8b5cf6; color: #c4b5fd; background: rgba(139, 92, 246, 0.16); font-weight: 600;" title="2-Minute Guided Innovation Tour for Hackathon Reviewers">
+          🧭 2-Min Judge Tour
+        </button>
+        <button id="btn-audio-toggle" class="btn-secondary-action btn-sm-compact" title="Toggle Procedural Cockpit Sound Design">
+          🔇 Audio Off
+        </button>
+        <button id="btn-listen-briefing" class="btn-primary-action btn-sm-compact" style="background: rgba(245, 158, 11, 0.16); border-color: var(--amber-primary); color: #fff;">
+          🔊 Route Voice Briefing
+        </button>
+        <div class="badge-tag-pill" style="margin-bottom: 0; padding: 0.35rem 0.85rem;">
+          <span id="app-user-name-badge">👤 Harshith (Verified)</span>
+        </div>
+        <button id="btn-app-logout" class="btn-secondary-action btn-sm-compact" style="color: var(--rose-danger);">
+          Sign Out
+        </button>
+      </div>
+    </nav>
+
+    <main class="command-main-workspace">
+      
+      <!-- ── TAB 1: MAIN JOURNEY PLANNER & MULTIMODAL COMPARISON ── -->
+      <section id="tab-planner" class="command-tab-page" style="display: block;">
+        
+        <!-- Natural Language Travel Goal Input -->
+        <div class="ai-natural-prompt-box">
+          <div class="card-micro-label">NATURAL-LANGUAGE TRAVEL GOAL INTELLIGENCE</div>
+          <textarea id="ai-prompt-input" class="ai-prompt-input" placeholder="Describe your travel goal in natural language (e.g. 'Plan a 7-day trip from Hyderabad to Goa for 4 people under ₹60,000. I want comfortable travel and don't want to drive more than 6 hours a day.')"></textarea>
+          
+          <div class="prompt-action-bar">
+            <span style="font-size: 0.8rem; color: var(--text-dim);">
+              Extracts: Origin &bull; Destination &bull; Duration &bull; Party Size &bull; Budget &bull; Mode Preferences
+            </span>
+            <button id="btn-analyze-prompt" class="btn-primary-action btn-sm-compact">
+              Synthesize Journey Goal ⚡
+            </button>
+          </div>
+        </div>
+
+        <!-- Structured Input Form Surface -->
+        <div class="surface-card" style="padding: 1.8rem 2rem; margin-bottom: 1.75rem;">
+          <div class="surface-card-header" style="padding: 0 0 1.25rem 0; margin-bottom: 1.5rem;">
+            <div>
+              <div class="card-micro-label">STRUCTURED JOURNEY PARAMETERS</div>
+              <h2 class="card-title-lg">Where will JOURNX take you next?</h2>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-dim);">
+              WORLDWIDE LOCATIONS &bull; ROAD, RAIL, AIR, HYBRID
+            </div>
+          </div>
+
+          <form id="structured-journey-form" onsubmit="event.preventDefault();">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; align-items: end;">
+              
+              <!-- Origin Field -->
+              <div class="form-group-block autocomplete-anchor" style="margin-bottom: 0;">
+                <label class="form-label-tag">📍 FROM (DEPARTURE)</label>
+                <input type="text" id="input-from-city" class="form-input-control" value="Hyderabad" placeholder="City, landmark, or airport..." autocomplete="off">
+                <div id="dropdown-from-list" class="autocomplete-dropdown-list"></div>
+              </div>
+
+              <!-- Destination Field -->
+              <div class="form-group-block autocomplete-anchor" style="margin-bottom: 0;">
+                <label class="form-label-tag">🏁 TO (DESTINATION)</label>
+                <input type="text" id="input-to-city" class="form-input-control" value="Goa" placeholder="Destination, landmark, city..." autocomplete="off">
+                <div id="dropdown-to-list" class="autocomplete-dropdown-list"></div>
+              </div>
+
+              <!-- Duration Days -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <label class="form-label-tag">📅 DURATION (DAYS)</label>
+                <input type="number" id="input-trip-days" class="form-input-control" value="7" min="1" max="45">
+              </div>
+
+              <!-- Travelers -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <label class="form-label-tag">👥 TRAVELERS</label>
+                <input type="number" id="input-trip-travelers" class="form-input-control" value="4" min="1" max="14">
+              </div>
+
+              <!-- Budget & Currency -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <label class="form-label-tag">💰 TARGET BUDGET</label>
+                <div style="display: flex; gap: 0.4rem;">
+                  <select id="select-trip-currency" class="form-input-control" style="width: 75px; cursor: pointer;">
+                    <option value="₹" selected>₹</option>
+                    <option value="$">$</option>
+                    <option value="€">€</option>
+                    <option value="£">£</option>
+                  </select>
+                  <input type="number" id="input-trip-budget" class="form-input-control" value="60000" style="flex: 1;">
+                </div>
+              </div>
+
+              <!-- Transport Preference -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <label class="form-label-tag">🚀 TRANSPORT PREFERENCE</label>
+                <select id="select-transport-pref" class="form-input-control" style="cursor: pointer;">
+                  <option value="Any" selected>Any / Multimodal Comparison</option>
+                  <option value="Road">Road Trip (Private Vehicle)</option>
+                  <option value="Train">Express Rail & Sleeper</option>
+                  <option value="Flight">Commercial Flight</option>
+                  <option value="Hybrid">Hybrid (Rail/Flight + Local Car)</option>
+                </select>
+              </div>
+
+              <!-- Lodging Level -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <label class="form-label-tag">🏨 ACCOMMODATION TIER</label>
+                <select id="select-lodging-tier" class="form-input-control" style="cursor: pointer;">
+                  <option value="comfort" selected>Comfort / Mid-Range (~₹3,600/nt)</option>
+                  <option value="budget">Budget Hotel (~₹1,600/nt)</option>
+                  <option value="luxury">Luxury Resort (~₹7,500/nt)</option>
+                </select>
+              </div>
+
+              <!-- Action Button -->
+              <div class="form-group-block" style="margin-bottom: 0;">
+                <button type="button" id="btn-calculate-journey-action" class="btn-primary-action" style="width: 100%; height: 46px; justify-content: center;">
+                  <span>⚡</span> Build Journey Plan
+                </button>
+              </div>
+
+            </div>
+          </form>
+
+          <!-- Quick Corridor Chips -->
+          <div class="quick-corridor-chips">
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">POPULAR CORRIDORS:</span>
+            <button class="corridor-chip-btn" data-from="Hyderabad" data-to="Goa">🚗 Hyderabad → Goa</button>
+            <button class="corridor-chip-btn" data-from="Mumbai" data-to="Goa">🌊 Mumbai → Goa</button>
+            <button class="corridor-chip-btn" data-from="New Delhi" data-to="Manali">🏔️ Delhi → Manali</button>
+            <button class="corridor-chip-btn" data-from="London" data-to="Paris">🚄 London → Paris</button>
+            <button class="corridor-chip-btn" data-from="New York" data-to="Washington DC">✈️ New York → Washington DC</button>
+            <button class="corridor-chip-btn" data-from="Dubai" data-to="Abu Dhabi">🏜️ Dubai → Abu Dhabi</button>
+            <button class="corridor-chip-btn" data-from="Tokyo" data-to="Kyoto">🚅 Tokyo → Kyoto</button>
+          </div>
+        </div>
+
+        <!-- Pre-Planning Confirmation Card (Section 18 Specification) -->
+        <div id="journey-confirmation-card" class="confirmation-card-banner">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div>
+              <div class="card-micro-label">CONFIRMATION PANEL // REVIEW JOURNEY PARAMETERS</div>
+              <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff;">Review Your Journey Goal</h3>
+            </div>
+            <div class="badge-tag-pill" style="margin-bottom: 0;">READY FOR INTELLIGENCE PIPELINE</div>
+          </div>
+
+          <div id="confirm-summary-details" style="margin-bottom: 1.25rem;"></div>
+
+          <div style="display: flex; gap: 1rem;">
+            <button id="btn-confirm-build-journey" class="btn-primary-action">
+              <span>🚀</span> Confirm & Build Journey
+            </button>
+            <button id="btn-confirm-edit-journey" class="btn-secondary-action">
+              Edit Details
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Planning Progress Animation Stream (Section 19 Specification) -->
+        <div id="planning-progress-stream" class="planning-progress-stream"></div>
+
+        <!-- Multimodal Strategy Results (Section 27 Specification) -->
+        <div id="multimodal-results-section" style="display: none;">
+          
+          <!-- AI Recommendation Box (Section 28 Specification) -->
+          <div class="surface-card" style="padding: 1.8rem 2rem; margin-bottom: 2rem; border-left: 5px solid var(--amber-primary);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              <div>
+                <div class="card-micro-label">AUTONOMOUS MULTIMODAL RECOMMENDATION ENGINE</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.45rem; color: #fff;">Recommended Multimodal Strategy</h3>
+              </div>
+              <span class="badge-tag-pill" style="margin-bottom: 0;">CONSENSUS ACHIEVED</span>
+            </div>
+            
+            <p id="ai-recommendation-rationale-text" style="font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 1.15rem;"></p>
+            <div id="ai-recommendation-tradeoffs-box"></div>
+          </div>
+
+          <!-- Strategy Comparison Cards Grid -->
+          <div class="surface-card-header" style="border: none; padding: 0 0 1rem 0;">
+            <div>
+              <div class="card-micro-label">CROSS-MODAL COMPARISON</div>
+              <h3 class="card-title-lg">Compare All Available Journey Strategies</h3>
+            </div>
+          </div>
+
+          <div id="multimodal-strategy-cards" class="multimodal-options-grid"></div>
+
+          <!-- ESG Sustainability & Carbon Neutrality Benchmark -->
+          <div class="surface-card" style="padding: 1.8rem 2rem; margin-top: 2rem; border-left: 5px solid var(--emerald-success);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div class="card-micro-label">ESG MOBILITY & SUSTAINABILITY INTELLIGENCE</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: #fff;">Carbon Footprint & Offset Benchmark</h3>
+              </div>
+              <button id="btn-offset-carbon" class="btn-primary-action btn-sm-compact" style="background: rgba(16, 185, 129, 0.2); border-color: var(--emerald-success); color: #fff;">
+                🌱 Neutralize Voyage & Generate ESG Certificate
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+              <div class="surface-card" style="padding: 1rem; background: var(--bg-core);">
+                <div style="font-size: 0.74rem; color: var(--text-dim); font-family: var(--font-mono);">PRIVATE HIGHWAY SUV</div>
+                <strong style="font-size: 1.3rem; color: #fff;">142 kg</strong> <span style="font-size: 0.76rem; color: var(--rose-danger);">CO₂</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Baseline Highway Combustion</div>
+              </div>
+              <div class="surface-card" style="padding: 1rem; background: var(--bg-core); border: 1px solid var(--emerald-success);">
+                <div style="font-size: 0.74rem; color: var(--emerald-success); font-family: var(--font-mono);">EXPRESS RAIL (OPTIMAL)</div>
+                <strong style="font-size: 1.3rem; color: var(--emerald-success);">38 kg</strong> <span style="font-size: 0.76rem; color: var(--emerald-success);">CO₂ (-73%)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Electrified Trunk Rail Corridor</div>
+              </div>
+              <div class="surface-card" style="padding: 1rem; background: var(--bg-core);">
+                <div style="font-size: 0.74rem; color: var(--text-dim); font-family: var(--font-mono);">COMMERCIAL FLIGHT</div>
+                <strong style="font-size: 1.3rem; color: #fff;">210 kg</strong> <span style="font-size: 0.76rem; color: var(--rose-danger);">CO₂ (+48%)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Jet Jet-A1 In-Flight Burn</div>
+              </div>
+              <div class="surface-card" style="padding: 1rem; background: var(--bg-core);">
+                <div style="font-size: 0.74rem; color: var(--text-dim); font-family: var(--font-mono);">EQUIVALENT OFFSET NEEDED</div>
+                <strong id="esg-trees-count" style="font-size: 1.3rem; color: var(--amber-primary);">5.8 Trees</strong>
+                <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">To neutralize this 630 km expedition</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ── TAB 2: INTERACTIVE MAP & WEATHER RADAR ── -->
+      <section id="tab-map-weather" class="command-tab-page" style="display: none;">
+        <div class="map-weather-split-grid">
+          
+          <!-- Leaflet Interactive Map -->
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <div class="card-micro-label">GOOGLE MAPS PLATFORM // MULTIMODAL CORRIDOR ENGINE</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff;">Interactive Corridor Map</h3>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button id="btn-gmaps-key-modal" class="btn-secondary-action btn-sm-compact" style="border-color: #4285F4; color: #93C5FD; background: rgba(66, 133, 244, 0.12);" title="Configure Real Google Maps API Key">
+                  🔑 Google Maps API
+                </button>
+                <button id="btn-open-google-maps" class="btn-primary-action btn-sm-compact" style="background: rgba(66, 133, 244, 0.18); border-color: #4285F4; color: #fff;">
+                  🧭 Open in Google Maps ↗
+                </button>
+                <span id="badge-map-mode-status" class="badge-tag-pill" style="margin-bottom: 0; padding: 0.35rem 0.85rem;">GOOGLE TILES ACTIVE</span>
+              </div>
+            </div>
+
+            <!-- Toolbar Row: Mode Switcher & Google Maps Base Map Picker -->
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+              <!-- Multimodal Map Layer Switcher -->
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                <button class="map-mode-btn active" data-map-mode="Road">🚗 Road Highway</button>
+                <button class="map-mode-btn" data-map-mode="Train">🚆 Rail Corridor</button>
+                <button class="map-mode-btn" data-map-mode="Flight">✈️ Flight Arc</button>
+              </div>
+
+              <!-- Google Maps Base Layer Switcher -->
+              <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-right: 0.2rem;">MAP:</span>
+                <button class="map-basemap-btn active" data-basemap="google-streets">🗺️ Google Streets</button>
+                <button class="map-basemap-btn" data-basemap="google-satellite">🛰️ Satellite Hybrid</button>
+                <button class="map-basemap-btn" data-basemap="google-terrain">⛰️ Terrain</button>
+                <button class="map-basemap-btn" data-basemap="google-native">⚡ 3D Vector (SDK)</button>
+                <button class="map-basemap-btn" data-basemap="osm">🌐 OSM</button>
+              </div>
+            </div>
+
+            <div id="map-canvas-container" style="position: relative; width: 100%; height: 480px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-subtle);">
+              <div id="leaflet-route-map" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>
+              <div id="google-native-map" style="position: absolute; top:0; left:0; width: 100%; height: 100%; display: none;"></div>
+            </div>
+          </div>
+
+          <!-- Real Weather Radar -->
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div class="card-micro-label">ATMOSPHERIC RADAR TELEMETRY // OPEN-METEO API</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: #fff; margin-bottom: 1.25rem;">Live Weather Radar</h3>
+
+            <div style="display: grid; gap: 1rem;">
+              <div class="surface-card" style="padding: 1.2rem; background: var(--bg-core);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong id="wt-origin-name" style="color: #fff; font-size: 1.05rem;">Hyderabad</strong>
+                    <div id="wt-origin-cond" style="color: var(--cyan-accent); font-size: 0.84rem;">Clear</div>
+                  </div>
+                  <div id="wt-origin-temp" style="font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: #fff;">30°C</div>
+                </div>
+              </div>
+
+              <div class="surface-card" style="padding: 1.2rem; background: var(--bg-core);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong id="wt-dest-name" style="color: #fff; font-size: 1.05rem;">Goa</strong>
+                    <div id="wt-dest-cond" style="color: var(--emerald-success); font-size: 0.84rem;">Partly Cloudy</div>
+                  </div>
+                  <div id="wt-dest-temp" style="font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: #fff;">29°C</div>
+                </div>
+              </div>
+
+              <div class="surface-card" style="padding: 1.2rem; background: var(--bg-core); border-left: 4px solid var(--emerald-success);">
+                <div class="card-micro-label">ROAD FRICTION INDEX</div>
+                <strong id="wt-traction-val" style="color: #fff; font-size: 0.95rem;">Optimal Grip (1.18μ)</strong>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">Dry pavement confirmed on trunk highway</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Corridor Elevation Profile & Altitude Topology -->
+        <div class="surface-card" style="padding: 1.6rem 2rem; margin-top: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div class="card-micro-label">TOPOGRAPHIC ELEVATION PROFILE // HIGHWAY GRADIENT RADAR</div>
+              <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff;">Corridor Elevation & Alpine Pass Topology</h3>
+            </div>
+            <div style="display: flex; gap: 1.5rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); flex-wrap: wrap;">
+              <span>SUMMIT: <strong style="color: var(--amber-primary);">810m (Chorla Ghat)</strong></span>
+              <span>MIN ALT: <strong style="color: var(--cyan-accent);">12m (Coastal Panaji)</strong></span>
+              <span>AVG INCLINE: <strong style="color: #fff;">2.4%</strong></span>
+            </div>
+          </div>
+
+          <!-- SVG Elevation Profile Canvas Graphic -->
+          <div style="width: 100%; height: 160px; position: relative; background: var(--bg-core); border-radius: 14px; border: 1px solid var(--border-subtle); overflow: hidden; padding: 0.5rem 1rem;">
+            <svg width="100%" height="100%" viewBox="0 0 800 130" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="elevationGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <!-- Filled Elevation Area -->
+              <path d="M 0,65 Q 120,75 220,55 T 440,78 T 600,22 T 680,18 L 800,118 L 800,130 L 0,130 Z" fill="url(#elevationGrad)"/>
+              <!-- Line Curve -->
+              <path d="M 0,65 Q 120,75 220,55 T 440,78 T 600,22 T 680,18 L 800,118" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+              <!-- Milestone Dots -->
+              <circle cx="10" cy="65" r="5" fill="#F59E0B" stroke="#fff" stroke-width="2"/>
+              <text x="15" y="55" fill="#fff" font-size="11" font-family="'Plus Jakarta Sans',sans-serif">Hyderabad (540m)</text>
+
+              <circle cx="220" cy="55" r="4" fill="#06B6D4"/>
+              <text x="220" y="45" fill="#94A3B8" font-size="10">Mahbubnagar (490m)</text>
+
+              <circle cx="440" cy="78" r="4" fill="#06B6D4"/>
+              <text x="440" y="98" fill="#94A3B8" font-size="10">Raichur Plains (380m)</text>
+
+              <circle cx="680" cy="18" r="6" fill="#EF4444" stroke="#fff" stroke-width="2"/>
+              <text x="630" y="12" fill="#FBBF24" font-weight="bold" font-size="11">Chorla Ghat Summit (810m)</text>
+
+              <circle cx="790" cy="118" r="5" fill="#10B981" stroke="#fff" stroke-width="2"/>
+              <text x="710" y="112" fill="#10B981" font-size="11">Goa Coast (15m)</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Sequential Waypoint Guidance & FASTag Toll Manifest -->
+        <div class="surface-card" style="padding: 1.6rem 2rem; margin-top: 1.75rem;">
+          <div class="card-micro-label">TURN-BY-TURN WAYPOINT GUIDANCE // HIGHWAY TELEMETRY</div>
+          <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff; margin-bottom: 1.25rem;">Sequential Waypoint & Toll Manifest</h3>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <div class="surface-card" style="padding: 1rem; background: var(--bg-core); border-left: 3px solid var(--amber-primary);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-dim);">
+                <span>KM 0 // DEPARTURE</span>
+                <span style="color: var(--emerald-success);">Ingress Verified</span>
+              </div>
+              <strong style="color: #fff; font-size: 0.96rem; display: block; margin: 0.3rem 0;">Gachibowli Outer Ring Road (ORR)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">FASTag Toll: ₹110 deducted &bull; 8-Lane Expressway</div>
+            </div>
+
+            <div class="surface-card" style="padding: 1rem; background: var(--bg-core); border-left: 3px solid var(--cyan-accent);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-dim);">
+                <span>KM 148 // REFUEL & EV</span>
+                <span style="color: var(--cyan-accent);">Amenities Verified</span>
+              </div>
+              <strong style="color: #fff; font-size: 0.96rem; display: block; margin: 0.3rem 0;">Jadcherla Expressway Oasis</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">BPCL Fuel Station &bull; 60kW DC Supercharger &bull; Clean Restrooms</div>
+            </div>
+
+            <div class="surface-card" style="padding: 1rem; background: var(--bg-core); border-left: 3px solid var(--amber-primary);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-dim);">
+                <span>KM 320 // TOLL BAND</span>
+                <span style="color: var(--amber-primary);">FASTag Live</span>
+              </div>
+              <strong style="color: #fff; font-size: 0.96rem; display: block; margin: 0.3rem 0;">Raichur NH-167 Toll Plaza</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">FASTag Toll: ₹165 deducted &bull; 4-Lane Trunk Corridor</div>
+            </div>
+
+            <div class="surface-card" style="padding: 1rem; background: var(--bg-core); border-left: 3px solid var(--rose-danger);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-dim);">
+                <span>KM 560 // ALPINE INCLINE</span>
+                <span style="color: var(--amber-primary);">Grip Advisory 0.74μ</span>
+              </div>
+              <strong style="color: #fff; font-size: 0.96rem; display: block; margin: 0.3rem 0;">Chorla Ghat Alpine Mountain Pass</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Hairpin Curves &bull; Elevation 810m &bull; Maintain Headway</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB 3: TRIP TWIN (SIMULATION ENVIRONMENT) ── -->
+      <section id="tab-trip-twin" class="command-tab-page" style="display: none;">
+        <div class="surface-card" style="padding: 1.8rem 2rem; margin-bottom: 1.75rem;">
+          <div class="card-micro-label">FLAGSHIP SIMULATION ENVIRONMENT</div>
+          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: #fff;">Trip Twin: Parameter Perturbation Engine</h2>
+          <p style="color: var(--text-sub); font-size: 0.92rem; margin-top: 0.35rem;">
+            Dynamically adjust budget, traveler headcount, and comfort preferences to re-evaluate all multimodal strategies in real-time.
+          </p>
+        </div>
+
+        <div class="trip-twin-layout-grid">
+          <!-- Controls Panel -->
+          <div class="surface-card" style="padding: 1.8rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: #fff;">Simulation Controls</h3>
+              <span class="badge-tag-pill" style="margin-bottom: 0; padding: 0.25rem 0.65rem;">LIVE PERTURBATION</span>
+            </div>
+
+            <!-- Stress Testing Scenario Chips -->
+            <div style="margin-bottom: 1.5rem;">
+              <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-bottom: 0.5rem;">STRESS-TEST PRESET SCENARIOS:</div>
+              <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                <button class="twin-preset-btn" data-preset="budget-slash">💰 -35% Budget Slash</button>
+                <button class="twin-preset-btn" data-preset="monsoon">⛈️ Monsoon Crisis</button>
+                <button class="twin-preset-btn" data-preset="family-convoy">👥 6 Travelers (Full Convoy)</button>
+                <button class="twin-preset-btn" data-preset="luxury-tier">✨ Luxury Resort Upgrade</button>
+              </div>
+            </div>
+
+            <div class="sim-slider-row">
+              <div class="sim-slider-header">
+                <span>Budget Cap</span>
+                <strong id="twin-val-budget" style="color: var(--amber-primary);">₹60,000</strong>
+              </div>
+              <input type="range" id="twin-slider-budget" class="sim-slider-input" min="20000" max="150000" step="5000" value="60000">
+            </div>
+
+            <div class="sim-slider-row">
+              <div class="sim-slider-header">
+                <span>Travelers Headcount</span>
+                <strong id="twin-val-travelers" style="color: #fff;">4 People</strong>
+              </div>
+              <input type="range" id="twin-slider-travelers" class="sim-slider-input" min="1" max="10" step="1" value="4">
+            </div>
+
+            <div class="sim-slider-row">
+              <div class="sim-slider-header">
+                <span>Duration (Days)</span>
+                <strong id="twin-val-days" style="color: #fff;">7 Days</strong>
+              </div>
+              <input type="range" id="twin-slider-days" class="sim-slider-input" min="2" max="21" step="1" value="7">
+            </div>
+
+            <div class="form-group-block" style="margin-bottom: 1.5rem;">
+              <label class="form-label-tag">COMFORT TIER</label>
+              <select id="twin-select-comfort" class="form-input-control">
+                <option value="comfort" selected>Comfort / Mid-Range</option>
+                <option value="budget">Budget Lodging</option>
+                <option value="luxury">Luxury Resort</option>
+              </select>
+            </div>
+
+            <!-- Conversational What-If Area (Section 30 Specification) -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+              <div class="card-micro-label">CONVERSATIONAL WHAT-IF QUERY</div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <input type="text" id="twin-whatif-input" class="form-input-control" placeholder="e.g. 'What if I reduce the budget to ₹40,000?'">
+                <button id="btn-twin-whatif-ask" class="btn-primary-action btn-sm-compact">Ask</button>
+              </div>
+              <div id="twin-whatif-answer-box" class="surface-card" style="display: none; padding: 1rem; margin-top: 0.85rem; background: var(--bg-core);"></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Recalculated Output -->
+          <div style="display: grid; gap: 1rem;">
+            <div class="surface-card" style="padding: 1.4rem; border-left: 4px solid var(--amber-primary);">
+              <div class="card-micro-label">SIMULATION CONSENSUS ENGINE</div>
+              <p id="twin-ai-rec-text" style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.55;">
+                Adjust sliders to simulate alternative cost bands and multimodal trade-offs.
+              </p>
+            </div>
+
+            <div id="twin-simulated-options-cards" style="display: grid; gap: 1rem;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB 4: TRIP GUARDIAN (DISRUPTION & REPLANNING) ── -->
+      <section id="tab-guardian" class="command-tab-page" style="display: none;">
+        <div class="surface-card" style="padding: 1.8rem 2rem; margin-bottom: 1.75rem;">
+          <div class="card-micro-label">AUTONOMOUS OPERATIONS & DISRUPTION MANAGEMENT</div>
+          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: #fff;">Trip Guardian: 5-Step Replanning Loop</h2>
+          <p style="color: var(--text-sub); font-size: 0.92rem; margin-top: 0.35rem;">
+            Continuously monitors weather radar and road networks. When an incident occurs, JOURNX executes:
+            <strong>Detect → Understand → Evaluate Bypasses → Simulate Consequences → Dispatch Replan</strong>.
+          </p>
+        </div>
+
+        <!-- Guardian Replan Active Banner -->
+        <div id="guardian-replan-modal" class="guardian-replan-modal-card">
+          <div id="guardian-replan-tag" class="card-micro-label">STEP 5/5: AUTONOMOUS DETOUR DISPATCH ACTIVE</div>
+          <h3 id="guardian-replan-title" style="font-family: var(--font-display); font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">
+            Rerouted via NH-748 Elevated Bypass
+          </h3>
+          <p id="guardian-replan-desc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem;"></p>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 0.85rem; margin-bottom: 1.2rem;">
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-dim);">SAFETY SCORE</div>
+              <strong id="guardian-metric-safety" style="color: var(--emerald-success); font-size: 1.1rem;">99.4%</strong>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-dim);">TIME SAVED</div>
+              <strong id="guardian-metric-time" style="color: var(--emerald-success); font-size: 1.1rem;">-4.2 hrs</strong>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-dim);">TOLL VARIANCE</div>
+              <strong id="guardian-metric-savings" style="color: var(--emerald-success); font-size: 1.1rem;">Saved ₹600</strong>
+            </div>
+          </div>
+
+          <button id="btn-guardian-dismiss" class="btn-secondary-action btn-sm-compact" style="width: 100%; justify-content: center;">
+            Dismiss Alert & Restore Normal Corridor
+          </button>
+        </div>
+
+        <!-- Incident Simulator Buttons -->
+        <div class="surface-card" style="padding: 1.8rem;">
+          <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: #fff; margin-bottom: 1.25rem;">
+            Simulate Corridor Disruption Scenarios
+          </h3>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <button class="btn-guardian-incident surface-card" style="padding: 1.2rem; cursor: pointer; text-align: left;" data-hazard="monsoon">
+              <div style="font-size: 1.35rem; margin-bottom: 0.35rem;">🌧️ Monsoon Flash Flood</div>
+              <div style="font-size: 0.82rem; color: var(--text-dim);">Chorla Ghat pass submerged @ KM 340.</div>
+            </button>
+
+            <button class="btn-guardian-incident surface-card" style="padding: 1.2rem; cursor: pointer; text-align: left;" data-hazard="landslide">
+              <div style="font-size: 1.35rem; margin-bottom: 0.35rem;">🚧 Mountain Landslide</div>
+              <div style="font-size: 0.82rem; color: var(--text-dim);">Boulder obstruction on ghat corridor.</div>
+            </button>
+
+            <button class="btn-guardian-incident surface-card" style="padding: 1.2rem; cursor: pointer; text-align: left;" data-hazard="traffic">
+              <div style="font-size: 1.35rem; margin-bottom: 0.35rem;">🚗 Expressway Gridlock</div>
+              <div style="font-size: 0.82rem; color: var(--text-dim);">14 km multi-vehicle bottleneck collision.</div>
+            </button>
+
+            <button class="btn-guardian-incident surface-card" style="padding: 1.2rem; cursor: pointer; text-align: left;" data-hazard="ev_fail">
+              <div style="font-size: 1.35rem; margin-bottom: 0.35rem;">⚡ EV Supercharger Outage</div>
+              <div style="font-size: 0.82rem; color: var(--text-dim);">Grid substation blackout, bypass to solar hub.</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB 5: ITINERARY & EXPENSES ── -->
+      <section id="tab-itinerary-expenses" class="command-tab-page" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.75rem;">
+          
+          <!-- Day by Day Itinerary -->
+          <div>
+            <div class="surface-card-header" style="border: none; padding: 0 0 1rem 0;">
+              <div>
+                <div class="card-micro-label">DAILY EXPEDITION SCHEDULE</div>
+                <h3 class="card-title-lg">Day-by-Day Journey Itinerary</h3>
+              </div>
+            </div>
+            <div id="itinerary-cards-container"></div>
+          </div>
+
+          <!-- Expense Tracker -->
+          <div>
+            <div class="surface-card-header" style="border: none; padding: 0 0 1rem 0;">
+              <div>
+                <div class="card-micro-label">BUDGET RECONCILIATION</div>
+                <h3 class="card-title-lg">Live Expense Tracker</h3>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button id="btn-export-calendar" class="btn-secondary-action btn-sm-compact">📅 Export Calendar (.ics)</button>
+                <button id="btn-add-expense-item" class="btn-primary-action btn-sm-compact">+ Add Expense</button>
+              </div>
+            </div>
+
+            <div class="surface-card" style="padding: 1rem; overflow-x: auto;">
+              <table class="expense-table-shell">
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>CATEGORY</th>
+                    <th>DESCRIPTION</th>
+                    <th>AMOUNT</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="expense-table-rows">
+                  <tr>
+                    <td>2026-10-04</td>
+                    <td>Fuel</td>
+                    <td>FASTag Expressway Refuel</td>
+                    <td style="color: #fff; font-weight: bold;">₹4,200</td>
+                    <td><span class="status-badge-live">Logged</span></td>
+                  </tr>
+                  <tr>
+                    <td>2026-10-04</td>
+                    <td>Tolls</td>
+                    <td>NH-748 FASTag Toll Band</td>
+                    <td style="color: #fff; font-weight: bold;">₹1,250</td>
+                    <td><span class="status-badge-live">Logged</span></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="display: flex; gap: 0.85rem; margin-top: 1.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem; flex-wrap: wrap;">
+                <button id="btn-export-pdf" class="btn-secondary-action btn-sm-compact">📥 Export PDF</button>
+                <button id="btn-export-csv" class="btn-secondary-action btn-sm-compact">📊 Export CSV</button>
+                <button id="btn-open-voyage-pass" class="btn-primary-action btn-sm-compact">🎫 Digital Voyage Pass</button>
+              </div>
+            </div>
+
+            <!-- AI Travel Readiness & Packing Intelligence -->
+            <div class="surface-card" style="padding: 1.25rem 1.4rem; margin-top: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+                <div>
+                  <div class="card-micro-label">TRAVEL READINESS & SMART PACKING</div>
+                  <h4 style="font-family: var(--font-display); font-size: 1.05rem; color: #fff;">Pre-Departure Checklist</h4>
+                </div>
+                <span id="checklist-progress-badge" class="badge-tag-pill" style="margin-bottom: 0;">2/5 Ready</span>
+              </div>
+
+              <div id="readiness-checklist-container">
+                <div class="checklist-item-row">
+                  <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; color: #fff; cursor: pointer;">
+                    <input type="checkbox" class="checklist-checkbox" checked>
+                    <span>FASTag & Highway Toll Pass Active Balance</span>
+                  </label>
+                  <span class="status-badge-live">Verified</span>
+                </div>
+                <div class="checklist-item-row">
+                  <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; color: #fff; cursor: pointer;">
+                    <input type="checkbox" class="checklist-checkbox" checked>
+                    <span>Government ID & Vehicle Registration Certificate</span>
+                  </label>
+                  <span class="status-badge-live">Verified</span>
+                </div>
+                <div class="checklist-item-row">
+                  <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; color: var(--text-sub); cursor: pointer;">
+                    <input type="checkbox" class="checklist-checkbox">
+                    <span>Weather Gear (Precipitation Shell & UV Protection)</span>
+                  </label>
+                  <span class="status-badge-calculated">Advisory</span>
+                </div>
+                <div class="checklist-item-row">
+                  <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; color: var(--text-sub); cursor: pointer;">
+                    <input type="checkbox" class="checklist-checkbox">
+                    <span>Vehicle Emergency First-Aid & Tire Inflator</span>
+                  </label>
+                  <span class="status-badge-calculated">Safety</span>
+                </div>
+                <div class="checklist-item-row">
+                  <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; color: var(--text-sub); cursor: pointer;">
+                    <input type="checkbox" class="checklist-checkbox">
+                    <span>Hotel & Resort Confirmation Vouchers</span>
+                  </label>
+                  <span class="status-badge-estimated">Optional</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── TAB 6: GLOBAL EXPLORE ── -->
+      <section id="tab-explore" class="command-tab-page" style="display: none;">
+        <div class="surface-card" style="padding: 1.8rem 2rem; margin-bottom: 1.75rem;">
+          <div class="card-micro-label">GLOBAL DESTINATION DISCOVERY</div>
+          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: #fff;">Explore Iconic Corridors & Landmarks</h2>
+          <p style="color: var(--text-sub); font-size: 0.92rem; margin-top: 0.35rem;">
+            Discover heritage sites, coastal drives, and alpine crossings dynamically resolved via global location APIs.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🗼 Eiffel Tower</div>
+            <strong style="color: #fff;">Paris, France</strong>
+            <div style="font-size: 0.84rem; color: var(--text-dim); margin-top: 0.3rem;">Historic cultural landmark & Seine River corridor.</div>
+          </div>
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🕌 Charminar & Golconda</div>
+            <strong style="color: #fff;">Hyderabad, India</strong>
+            <div style="font-size: 0.84rem; color: var(--text-dim); margin-top: 0.3rem;">430-year-old architectural monument & heritage bazaars.</div>
+          </div>
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🏛️ Colosseum</div>
+            <strong style="color: #fff;">Rome, Italy</strong>
+            <div style="font-size: 0.84rem; color: var(--text-dim); margin-top: 0.3rem;">Ancient Roman amphitheater & archaeological forum.</div>
+          </div>
+          <div class="surface-card" style="padding: 1.4rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🏔️ Rohtang Pass</div>
+            <strong style="color: #fff;">Manali to Leh, India</strong>
+            <div style="font-size: 0.84rem; color: var(--text-dim); margin-top: 0.3rem;">High Himalayan road trip pass reaching 3,980m elevation.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB 7: USER PROFILE ── -->
+      <section id="tab-profile" class="command-tab-page" style="display: none;">
+        <div class="surface-card" style="padding: 1.8rem 2rem; max-width: 800px;">
+          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: #fff; margin-bottom: 1.5rem;">Traveler Profile & Vehicle Specs</h2>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+            <div>
+              <label class="form-label-tag">NAME</label>
+              <input type="text" class="form-input-control" value="Harshith (Verified Traveler)" readonly>
+            </div>
+            <div>
+              <label class="form-label-tag">EMAIL</label>
+              <input type="text" class="form-input-control" value="traveler@journx.ai" readonly>
+            </div>
+            <div>
+              <label class="form-label-tag">HOME CITY</label>
+              <input type="text" class="form-input-control" value="Hyderabad, India">
+            </div>
+            <div>
+              <label class="form-label-tag">DEFAULT BUDGET</label>
+              <input type="text" class="form-input-control" value="₹60,000">
+            </div>
+            <div>
+              <label class="form-label-tag">VEHICLE PROFILE</label>
+              <input type="text" class="form-input-control" value="Diesel SUV (4x4)">
+            </div>
+            <div>
+              <label class="form-label-tag">CALIBRATED MILEAGE</label>
+              <input type="text" class="form-input-control" value="13.5 km/L">
+            </div>
+
+            <!-- Google Maps API Key Configuration -->
+            <div style="grid-column: span 2; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem; margin-top: 0.5rem;">
+              <div class="card-micro-label">GOOGLE MAPS PLATFORM API INTEGRATION</div>
+              <label class="form-label-tag">GOOGLE MAPS API KEY (OPTIONAL // OFFICIAL DIRECTIONS & PLACES API)</label>
+              <div style="display: flex; gap: 0.75rem;">
+                <input type="password" id="input-gmaps-key" class="form-input-control" placeholder="AIzaSy... (leave blank to use built-in Google Maps tiles)">
+                <button type="button" id="btn-save-gmaps-key" class="btn-primary-action btn-sm-compact">Save Key</button>
+              </div>
+              <div style="font-size: 0.76rem; color: var(--text-dim); margin-top: 0.4rem;">
+                Supports official Google Maps Directions routing, Google Satellite Photorealistic Hybrid tiles, and Google Navigation.
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary-action btn-sm-compact" onclick="window.showToast('✅ Profile & vehicle preferences saved to database.')">Save Profile Changes</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       LUXURY DIGITAL VOYAGE PASS MODAL (BOARDING DOSSIER)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="modal-voyage-pass" class="voyage-pass-modal-backdrop">
+    <div class="voyage-pass-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.25rem;">
+        <div class="brand-identity-cluster">
+          <div class="brand-symbol-box">🌐</div>
+          <div>
+            <div class="brand-wordmark" style="font-size: 1.35rem;">JOURN<span>X</span></div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.1em;">DIGITAL VOYAGE DOSSIER // PASS #JX-2026-884</div>
+          </div>
+        </div>
+        <button id="btn-close-voyage-pass" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--text-dim); margin-bottom: 0.2rem;">VERIFIED TRAVELER</div>
+          <strong id="pass-traveler-name" style="color: #fff; font-size: 1.15rem;">Harshith (Verified Traveler)</strong>
+
+          <div style="display: flex; gap: 1.5rem; margin-top: 1.25rem;">
+            <div>
+              <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">ORIGIN INGRESS</div>
+              <strong id="pass-origin" style="color: var(--amber-primary); font-size: 1.1rem;">Hyderabad</strong>
+            </div>
+            <div style="display: flex; align-items: center; color: var(--text-muted); font-size: 1.2rem;">➔</div>
+            <div>
+              <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">TARGET ARRIVAL</div>
+              <strong id="pass-destination" style="color: var(--emerald-success); font-size: 1.1rem;">Goa</strong>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; font-size: 0.84rem;">
+            <div>
+              <span style="color: var(--text-dim);">Selected Strategy:</span><br>
+              <strong id="pass-mode" style="color: #fff;">Private Highway SUV</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-dim);">Trip Duration:</span><br>
+              <strong id="pass-days" style="color: #fff;">7 Days (4 Travelers)</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-dim);">Total Budget Cap:</span><br>
+              <strong id="pass-budget" style="color: var(--amber-primary);">₹60,000</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-dim);">Road Grip Index:</span><br>
+              <strong id="pass-traction" style="color: var(--emerald-success);">1.18μ Optimal</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Pass QR Graphic & SOS -->
+        <div style="background: var(--bg-core); border: 1px solid var(--border-medium); border-radius: 16px; padding: 1.2rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="background: #fff; padding: 8px; border-radius: 10px; margin-bottom: 0.75rem;">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="#080B10">
+              <rect width="100" height="100" fill="#fff"/>
+              <rect x="10" y="10" width="24" height="24" fill="#080B10"/>
+              <rect x="14" y="14" width="16" height="16" fill="#fff"/>
+              <rect x="18" y="18" width="8" height="8" fill="#080B10"/>
+              <rect x="66" y="10" width="24" height="24" fill="#080B10"/>
+              <rect x="70" y="14" width="16" height="16" fill="#fff"/>
+              <rect x="74" y="18" width="8" height="8" fill="#080B10"/>
+              <rect x="10" y="66" width="24" height="24" fill="#080B10"/>
+              <rect x="14" y="70" width="16" height="16" fill="#fff"/>
+              <rect x="18" y="74" width="8" height="8" fill="#080B10"/>
+              <rect x="42" y="12" width="6" height="14"/>
+              <rect x="52" y="18" width="8" height="6"/>
+              <rect x="42" y="42" width="16" height="16"/>
+              <rect x="64" y="44" width="12" height="6"/>
+              <rect x="12" y="44" width="14" height="8"/>
+              <rect x="44" y="68" width="10" height="18"/>
+              <rect x="68" y="68" width="20" height="20"/>
+            </svg>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em;">SCAN TO VALIDATE DOSSIER</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--emerald-success); margin-top: 0.35rem;">NHAI / FASTAG LINKED</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+        <div style="font-size: 0.78rem; color: var(--text-dim);">
+          🚨 Highway Emergency Dispatch: <strong>1033 (Toll Free)</strong> &bull; Concierge: <strong>concierge@journx.ai</strong>
+        </div>
+        <button id="btn-print-voyage-pass" class="btn-primary-action btn-sm-compact" onclick="window.print()">
+          🖨️ Print Voyage Pass
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       ESG CARBON NEUTRALITY VERIFIED CERTIFICATE MODAL
+  ───────────────────────────────────────────────────────────── -->
+  <div id="modal-esg-certificate" class="esg-cert-modal-backdrop">
+    <div class="esg-cert-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(16, 185, 129, 0.2); padding-bottom: 1.25rem;">
+        <div class="brand-identity-cluster">
+          <div class="brand-symbol-box" style="background: rgba(16, 185, 129, 0.2); border-color: var(--emerald-success); color: var(--emerald-success);">🌱</div>
+          <div>
+            <div class="brand-wordmark" style="font-size: 1.35rem; color: #fff;">JOURN<span>X</span> <span style="font-size: 0.75rem; color: var(--emerald-success); font-family: var(--font-mono); font-weight: 500; border: 1px solid var(--emerald-success); padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.5rem;">ESG VERIFIED</span></div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--emerald-success); letter-spacing: 0.1em;">CARBON NEUTRAL EXPEDITION CERTIFICATE</div>
+          </div>
+        </div>
+        <button id="btn-close-esg-cert" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-dim); margin-bottom: 0.35rem;">CERTIFICATE ISSUED TO:</div>
+        <h2 id="esg-cert-traveler-name" style="font-family: var(--font-display); font-size: 1.6rem; color: #fff; margin-bottom: 0.4rem;">Harshith (Verified Traveler)</h2>
+        <div style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+          This official certificate ratifies that all Scope 1 & Scope 3 carbon emissions generated across the voyage corridor from <strong id="esg-cert-corridor" style="color: #fff;">Hyderabad ➔ Goa</strong> have been fully offset through verified agroforestry reforestation and renewable grid displacement programs.
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; background: rgba(0, 0, 0, 0.35); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.25);">
+        <div>
+          <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">NET OFFSET METRIC</div>
+          <strong id="esg-cert-co2" style="font-size: 1.4rem; color: var(--emerald-success);">142 kg CO₂</strong>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Full Route Footprint</div>
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">RESTORATION IMPACT</div>
+          <strong id="esg-cert-trees" style="font-size: 1.4rem; color: var(--amber-primary);">5.8 Trees</strong>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Western Ghats Agroforestry</div>
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">VERIFICATION HASH</div>
+          <div style="font-size: 0.75rem; font-family: var(--font-mono); color: #fff; margin-top: 0.2rem; word-break: break-all;">0x7F9A...B302</div>
+          <div style="font-size: 0.72rem; color: var(--emerald-success); margin-top: 0.2rem;">ISO 14064 Compliant</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(16, 185, 129, 0.2); padding-top: 1.25rem;">
+        <div style="font-size: 0.76rem; color: var(--text-dim); font-family: var(--font-mono);">
+          REGISTRY: <strong>UNFCCC / VERRA VC-8829</strong> &bull; AUDIT REF: <strong>JX-ESG-2026-GHG</strong>
+        </div>
+        <button class="btn-primary-action btn-sm-compact" style="background: var(--emerald-success); border-color: var(--emerald-success); color: #040806; font-weight: 700;" onclick="window.print()">
+          🌱 Download ESG Certificate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       HACKATHON SUBMISSION SHOWCASE & INNOVATION BRIEFING MODAL
+  ───────────────────────────────────────────────────────────── -->
+  <div id="modal-judge-tour" class="esg-cert-modal-backdrop">
+    <div class="voyage-pass-card" style="max-width: 760px; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+        <div class="brand-identity-cluster">
+          <div class="brand-symbol-box" style="background: rgba(139, 92, 246, 0.2); border-color: #8b5cf6; color: #c4b5fd;">✨</div>
+          <div>
+            <div class="brand-wordmark" style="font-size: 1.35rem;">JOURN<span>X</span> <span style="font-size: 0.75rem; color: #c4b5fd; font-family: var(--font-mono); font-weight: 500; border: 1px solid #8b5cf6; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.5rem;">EVALUATION DOSSIER</span></div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em;">AUTONOMOUS MULTIMODAL PLATFORM ARCHITECTURE</div>
+          </div>
+        </div>
+        <button id="btn-close-judge-tour" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="margin-bottom: 1.25rem; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 12px; padding: 1rem;">
+        <div style="font-size: 0.88rem; color: #fff; font-weight: 600; margin-bottom: 0.25rem;">Executive Summary for Submission Reviewers</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+          JOURNX replaces fragmented navigation tools with a single unified, cognitive travel operating system. It computes real-time trade-offs across Road, Rail, Aviation, and Hybrid corridors while simulating disruptions and safeguarding sustainability.
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.25rem;">
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">1. 🌐 3D Digital Holographic Globe</strong>
+            <button class="tour-jump-btn" data-jump="intro">Replay 3D</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">WebGL procedural globe with Bézier flight arcs, hub coordinates & mouse parallax.</p>
+        </div>
+
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">2. 🔀 Multimodal Strategy Matrix</strong>
+            <button class="tour-jump-btn" data-jump="planner">Go to Planner</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">Dynamic trade-off engine computing ETA, comfort, cost & carbon across 4 modes.</p>
+        </div>
+
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">3. 🗺️ Dual Maps & Weather Radar</strong>
+            <button class="tour-jump-btn" data-jump="map">View Map</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">Google Streets/Satellite/Terrain tiles + Open-Meteo live rainfall radar & elevation.</p>
+        </div>
+
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">4. 🧬 Trip Twin Simulation</strong>
+            <button class="tour-jump-btn" data-jump="twin">Run Stress-Test</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">Interactive sliders + 4 scenario presets (-35% budget, monsoon, convoy, luxury).</p>
+        </div>
+
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">5. 🛡️ Trip Guardian Hazard Rerouting</strong>
+            <button class="tour-jump-btn" data-jump="guardian">Simulate Reroute</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">Simulates Ghat landslides, highway gridlocks and executes autonomous reroutes.</p>
+        </div>
+
+        <div class="surface-card" style="padding: 0.85rem; background: var(--bg-core);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #fff; font-size: 0.84rem;">6. 🌱 ESG Carbon Neutrality Certificate</strong>
+            <button class="tour-jump-btn" data-jump="esg">View Certificate</button>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-dim); margin: 0;">Verra/UNFCCC blockchain audit hash + printable agroforestry certificate.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+        <div style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--text-dim);">
+          SHORTCUTS: <strong style="color:#fff;">1-5</strong> Tabs &bull; <strong style="color:#fff;">M</strong> Audio &bull; <strong style="color:#fff;">V</strong> Briefing &bull; <strong style="color:#fff;">ESC</strong> Close
+        </div>
+        <button id="btn-close-tour-footer" class="btn-primary-action btn-sm-compact">
+          Close Dossier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       REAL GOOGLE MAPS API PLATFORM CONFIG MODAL
+  ───────────────────────────────────────────────────────────── -->
+  <div id="modal-gmaps-config" class="esg-cert-modal-backdrop">
+    <div class="voyage-pass-card" style="max-width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+        <div class="brand-identity-cluster">
+          <div class="brand-symbol-box" style="background: rgba(66, 133, 244, 0.2); border-color: #4285F4; color: #93C5FD;">🗺️</div>
+          <div>
+            <div class="brand-wordmark" style="font-size: 1.35rem;">GOOGLE<span>MAPS</span> <span style="font-size: 0.75rem; color: #93C5FD; font-family: var(--font-mono); font-weight: 500; border: 1px solid #4285F4; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.5rem;">PLATFORM API</span></div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em;">NATIVE JAVASCRIPT SDK & PLACES AUTOCOMPLETE</div>
+          </div>
+        </div>
+        <button id="btn-close-gmaps-modal" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 1.25rem;">
+        JOURNX includes built-in high-resolution Google Satellite, Streets, and Terrain tiles that work instantly with zero quota. Enter your <strong>Google Cloud Maps API Key</strong> to unlock native vector 3D building extrusions, real Google Places Autocomplete dropdowns, and Google Directions turn-by-turn geometry.
+      </p>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-dim); margin-bottom: 0.4rem;">GOOGLE MAPS JAVASCRIPT API KEY</label>
+        <input type="password" id="modal-input-gmaps-key" placeholder="AIzaSy..." style="width: 100%; background: var(--bg-core); border: 1px solid var(--border-medium); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; font-family: var(--font-mono); font-size: 0.88rem;">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+        <button id="btn-clear-gmaps-key" class="btn-secondary-action btn-sm-compact" style="color: var(--rose-danger);">
+          Reset / Clear Key
+        </button>
+        <button id="btn-activate-gmaps-key" class="btn-primary-action btn-sm-compact" style="background: #4285F4; border-color: #4285F4; color: #fff;">
+          ⚡ Activate Native Google Maps SDK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Shell -->
+  <div id="journx-toast" class="journx-toast"></div>
+
+  <!-- Global Strategy Selection Handler & Toast Utility -->
+  <script>
+    window.showToast = function(msg) {
+      const t = document.getElementById('journx-toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+    };
+
+    window.selectStrategyOption = function(mode) {
+      window.showToast("✅ Selected " + mode + " Strategy — Switched to Live Map & Radar");
+      document.querySelector('[data-tab="tab-map-weather"]').click();
+    };
+  </script>
+
+  <!-- Master Application Script -->
+  <script type="module" src="./src/main.js?v=12.0"></script>
+</body>
+</html>

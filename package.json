@@ -1,0 +1,9 @@
+{
+  "name": "roadmate-3d",
+  "version": "1.0.0",
+  "description": "Futuristic scroll-driven 3D travel experience",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
